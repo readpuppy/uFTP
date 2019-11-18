@@ -50,6 +50,9 @@
 #include "ftpData.h"
 #include "ftpCommandsElaborate.h"
 
+// force the FTP server to run as ReadOnly (no upload/delete/mkdir)
+int run_ReadOnly = 0;
+
 ftpDataType ftpData;
 
 
@@ -293,7 +296,9 @@ void *connectionWorkerHandle(void * socketId)
             ftpData.clients[theSocketId].fileToStor.textLen > 0)
         {
 
-        	if ((checkParentDirectoryPermissions(ftpData.clients[theSocketId].fileToStor.text, ftpData.clients[theSocketId].login.ownerShip.uid, ftpData.clients[theSocketId].login.ownerShip.gid) & FILE_PERMISSION_W) != FILE_PERMISSION_W)
+        	if  (run_ReadOnly ||
+                 ((checkParentDirectoryPermissions(ftpData.clients[theSocketId].fileToStor.text, ftpData.clients[theSocketId].login.ownerShip.uid, ftpData.clients[theSocketId].login.ownerShip.gid) & FILE_PERMISSION_W) != FILE_PERMISSION_W)
+                 )
         	{
             	returnCode = socketPrintf(&ftpData, theSocketId, "s", "550 No permissions to write the file\r\n");
 

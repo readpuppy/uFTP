@@ -29,6 +29,8 @@
 #define MAX_FTP_CLIENTS                 10
 #define UFTP_SERVER_VERSION             "v2.2.0 RC1"
 
+// force the ftp server to rn as read only
+extern int run_ReadOnly; 
 
 void runFtpServer(void);
 void *connectionWorkerHandle(void * socketId);

@@ -30,7 +30,11 @@
 
 int main(int argc, char** argv) 
 {
-
+    if (argc>1) {
+        if ((argv[1][0]=='-') && (argv[1][1]=='R'))  run_ReadOnly= 1;
+        if ((argv[1][0]=='-') && (argv[1][1]=='W'))  run_ReadOnly= 0;
+    }
+    printf("uFTP will run as ReadOnly=%s\r\n", (run_ReadOnly)? "True":"False");
     runFtpServer();
     return (EXIT_SUCCESS);
 }

@@ -714,7 +714,14 @@ int parseCommandStor(ftpDataType * data, int socketId)
 {
     int isSafePath = 0;
     char *theNameToStor;
+/*
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 Could not upload the file: no permissions\r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
+*/
     theNameToStor = getFtpCommandArg("STOR", data->clients[socketId].theCommandReceived, 0);
+
     cleanDynamicStringDataType(&data->clients[socketId].fileToStor, 0, &data->clients[socketId].memoryTable);
 
     if (strlen(theNameToStor) > 0)
@@ -887,9 +894,16 @@ int parseCommandMkd(ftpDataType * data, int socketId)
     char *theDirectoryFilename;
     dynamicStringDataType mkdFileName;
 
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 no permition to create directory. \r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
+
     theDirectoryFilename = getFtpCommandArg("MKD", data->clients[socketId].theCommandReceived, 0);
-    
+
     cleanDynamicStringDataType(&mkdFileName, 1, &data->clients[socketId].memoryTable);
+
+
     isSafePath = getSafePath(&mkdFileName, theDirectoryFilename, &data->clients[socketId].login, &data->clients[socketId].memoryTable);
     
     if (isSafePath == 1)
@@ -974,9 +988,16 @@ int parseCommandDele(ftpDataType * data, int socketId)
     char *theFileToDelete;
     dynamicStringDataType deleFileName;
 
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 Could not delete the file: no permissions\r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
+
     theFileToDelete = getFtpCommandArg("DELE", data->clients[socketId].theCommandReceived, 0);
 
     cleanDynamicStringDataType(&deleFileName, 1, &data->clients[socketId].memoryTable);
+
+
     isSafePath = getSafePath(&deleFileName, theFileToDelete, &data->clients[socketId].login, &data->clients[socketId].memoryTable);
     
     if (isSafePath == 1)
@@ -1132,8 +1153,14 @@ int parseCommandRmd(ftpDataType * data, int socketId)
     char *theDirectoryFilename;
     dynamicStringDataType rmdFileName;
 
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 Could not delete the directory: No permissions\r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
+
     theDirectoryFilename = getFtpCommandArg("RMD", data->clients[socketId].theCommandReceived, 0);
     cleanDynamicStringDataType(&rmdFileName, 1, &data->clients[socketId].memoryTable);
+
     isSafePath = getSafePath(&rmdFileName, theDirectoryFilename, &data->clients[socketId].login, &data->clients[socketId].memoryTable);
     
     if (isSafePath == 1)
@@ -1231,6 +1258,11 @@ int parseCommandRnfr(ftpDataType * data, int socketId)
     int isSafePath;
     char *theRnfrFileName;
 
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 Could not rename file: No permissions\r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
+
     theRnfrFileName = getFtpCommandArg("RNFR", data->clients[socketId].theCommandReceived, 0);
     cleanDynamicStringDataType(&data->clients[socketId].renameFromFile, 0, &data->clients[socketId].memoryTable);
     
@@ -1265,6 +1297,11 @@ int parseCommandRnto(ftpDataType * data, int socketId)
     int returnCode = 0;
     int isSafePath;
     char *theRntoFileName;
+
+    if (run_ReadOnly) {
+        socketPrintf(data, socketId, "s", "550 Could not rename the file: No permissions\r\n");
+        return FTP_COMMAND_PROCESSED;
+    }
 
     theRntoFileName = getFtpCommandArg("RNTO", data->clients[socketId].theCommandReceived, 0);
     cleanDynamicStringDataType(&data->clients[socketId].renameToFile, 0, &data->clients[socketId].memoryTable);
